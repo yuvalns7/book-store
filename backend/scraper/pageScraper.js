@@ -82,7 +82,7 @@ const scraperObject = {
         rating: 0,
       }
     })
-    // await Book.insertMany(books)
+    await Book.insertMany(books)
   },
 }
 
