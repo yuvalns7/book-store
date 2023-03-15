@@ -1,6 +1,21 @@
 const asyncHandler = require("express-async-handler");
 const { generateToken } = require("../utils/generateToken");
 const { User } = require("../models/userModel");
+const { initializeApp } = require("firebase/app");
+const { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } = require("firebase/auth");
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCPNO95RSWLHPDPTpcxm3i0xQ0MmWvOO1E",
+  authDomain: "book-store-4f2d6.firebaseapp.com",
+  projectId: "book-store-4f2d6",
+  storageBucket: "book-store-4f2d6.appspot.com",
+  messagingSenderId: "1052931738305",
+  appId: "1:1052931738305:web:866213b5e69db43a102240"
+};
+
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
 
 // @desc    Auth user & get token
 // @route   POST /api/users/login
@@ -8,20 +23,15 @@ const { User } = require("../models/userModel");
 const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  const user = await User.findOne({ email });
-
-  if (user && (await user.matchPassword(password))) {
-    res.json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      isAdmin: user.isAdmin,
-      token: generateToken(user._id),
-    });
-  } else {
-    res.status(401);
-    throw new Error("Invalid email or password");
-  }
+  signInWithEmailAndPassword(auth, email, password)
+  .then((userCredential) => {
+    // Signed in 
+    const user = userCredential.user;
+  })
+  .catch((error) => {
+    const errorCode = error.code;
+    const errorMessage = error.message;
+  });
 });
 
 // @desc    Register a new user
@@ -30,31 +40,15 @@ const authUser = asyncHandler(async (req, res) => {
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
 
-  const userExists = await User.findOne({ email });
-
-  if (userExists) {
-    res.status(404);
-    throw new Error("User already exists");
-  }
-
-  const user = await User.create({
-    name,
-    email,
-    password,
+  createUserWithEmailAndPassword(auth, email, password)
+  .then((userCredential) => {
+    // Signed in 
+    const user = userCredential.user;
+  })
+  .catch((error) => {
+    const errorCode = error.code;
+    const errorMessage = error.message;
   });
-
-  if (user) {
-    res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      isAdmin: user.isAdmin,
-      token: generateToken(user._id),
-    });
-  } else {
-    res.status(400);
-    throw new Error("Invalid user data");
-  }
 });
 
 // @desc    Get user profile
