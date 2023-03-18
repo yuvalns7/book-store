@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom"
 import Header from "./components/Header/Header"
 import Footer from "./components/Footer/Footer"
@@ -17,8 +17,22 @@ import UserEdit from "./pages/UserEdit/UserEdit"
 import BookList from "./pages/BookList/BookList"
 import BookEdit from "./pages/BookEdit/BookEdit"
 import OrderList from "./pages/OrderList/OrderList"
+import socketIOClient from "socket.io-client"
+const ENDPOINT = "http://127.0.0.1:5000"
 
 const App = () => {
+  const [activeUserCount, setActiveUserCount] = useState("")
+
+  useEffect(() => {
+    const socket = socketIOClient(ENDPOINT)
+    socket.on("clients", (data) => {
+      setActiveUserCount(data)
+      console.log(activeUserCount)
+    })
+
+    return () => socket.disconnect()
+  }, [])
+
   return (
     <div className='app'>
       <Router>
@@ -35,7 +49,10 @@ const App = () => {
             <Route path='/book/:id' element={<BookDetail />} />
             <Route path='/cart' element={<Cart />} />
             <Route path='/cart/:id' element={<Cart />} />
-            <Route path='/admin/userlist' element={<UserList />} />
+            <Route
+              path='/admin/userlist'
+              element={<UserList activeUserCount={activeUserCount} />}
+            />
             <Route path='/admin/user/:id/edit' element={<UserEdit />} />
             <Route path='/admin/booklist' element={<BookList />} />
             <Route path='/admin/orderlist' element={<OrderList />} />
