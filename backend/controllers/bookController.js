@@ -1,12 +1,12 @@
-const asyncHandler = require("express-async-handler");
-const { Book } = require("../models/bookModel");
+const asyncHandler = require("express-async-handler")
+const { Book } = require("../models/bookModel")
 
 // @desc    Fetch all books
 // @route   GET /api/books
 // @access  Public
 const getBooks = asyncHandler(async (req, res) => {
-  const pageSize = 12;
-  const page = Number(req.query.pageNumber) || 1;
+  const pageSize = 12
+  const page = Number(req.query.pageNumber) || 1
 
   const keyword = req.query.keyword
     ? {
@@ -15,44 +15,62 @@ const getBooks = asyncHandler(async (req, res) => {
           $options: "i",
         },
       }
-    : {};
+    : {}
+  const maxPrice = req.query.maxPrice
+    ? {
+        price: {
+          $lte: Number(req.query.maxPrice),
+        },
+      }
+    : {}
+  const minRating = req.query.minRating
+    ? {
+        rating: {
+          $gte: Number(req.query.minRating),
+        },
+      }
+    : {}
 
-  const count = await Book.countDocuments({ ...keyword });
-  const books = await Book.find({ ...keyword })
+  const count = await Book.countDocuments({
+    ...keyword,
+    ...maxPrice,
+    ...minRating,
+  })
+  const books = await Book.find({ ...keyword, ...maxPrice, ...minRating })
     .limit(pageSize)
-    .skip(pageSize * (page - 1));
+    .skip(pageSize * (page - 1))
 
-  res.json({ books, page, pages: Math.ceil(count / pageSize) });
-});
+  res.json({ books, page, pages: Math.ceil(count / pageSize) })
+})
 
 // @desc    Fetch single book
 // @route   GET /api/books/:id
 // @access  Public
 const getBookById = asyncHandler(async (req, res) => {
-  const book = await Book.findById(req.params.id);
+  const book = await Book.findById(req.params.id)
 
   if (book) {
-    res.json(book);
+    res.json(book)
   } else {
-    res.status(404);
-    throw new Error("Book not found");
+    res.status(404)
+    throw new Error("Book not found")
   }
-});
+})
 
 // @desc    Delete a Book
 // @route   GET /api/books/:id
 // @access  Private/Admin
 const deleteBook = asyncHandler(async (req, res) => {
-  const book = await Book.findById(req.params.id);
+  const book = await Book.findById(req.params.id)
 
   if (book) {
-    await book.remove();
-    res.json({ message: "Book removed" });
+    await book.remove()
+    res.json({ message: "Book removed" })
   } else {
-    res.status(404);
-    throw new Error("Book not found");
+    res.status(404)
+    throw new Error("Book not found")
   }
-});
+})
 
 // @desc    Create a Book
 // @route   POST /api/books
@@ -68,54 +86,54 @@ const createBook = asyncHandler(async (req, res) => {
     countInStock: 0,
     numReviews: 0,
     description: "No description",
-  });
+  })
 
-  const createdBook = await book.save();
-  res.status(201).json(createdBook);
-});
+  const createdBook = await book.save()
+  res.status(201).json(createdBook)
+})
 
 // @desc    Update a Book
 // @route   PUT /api/books/:id
 // @access  Private/Admin
 const updateBook = asyncHandler(async (req, res) => {
   const { name, price, description, image, author, genre, countInStock } =
-    req.body;
+    req.body
 
-  const book = await Book.findById(req.params.id);
+  const book = await Book.findById(req.params.id)
 
   if (book) {
-    book.name = name;
-    book.price = price;
-    book.description = description;
-    book.image = image;
-    book.author = author;
-    book.genre = genre;
-    book.countInStock = countInStock;
+    book.name = name
+    book.price = price
+    book.description = description
+    book.image = image
+    book.author = author
+    book.genre = genre
+    book.countInStock = countInStock
 
-    const updatedBook = await book.save();
-    res.json(updatedBook);
+    const updatedBook = await book.save()
+    res.json(updatedBook)
   } else {
-    res.status(404);
-    throw new Error("Book not found");
+    res.status(404)
+    throw new Error("Book not found")
   }
-});
+})
 
 // @desc    Create new review
 // @route   POST /api/books/:id/reivew
 // @access  Private
 const createBookReview = asyncHandler(async (req, res) => {
-  const { rating, comment } = req.body;
+  const { rating, comment } = req.body
 
-  const book = await Book.findById(req.params.id);
+  const book = await Book.findById(req.params.id)
 
   if (book) {
     const alreadyReviewed = book.reviews.find(
       (r) => r.user.toString() === req.user._id.toString()
-    );
+    )
 
     if (alreadyReviewed) {
-      res.status(400);
-      throw new Error("Book already reviewed");
+      res.status(400)
+      throw new Error("Book already reviewed")
     }
 
     const review = {
@@ -123,33 +141,33 @@ const createBookReview = asyncHandler(async (req, res) => {
       rating: Number(rating),
       comment,
       user: req.user._id,
-    };
+    }
 
-    book.reviews.push(review);
+    book.reviews.push(review)
 
-    book.numReviews = book.reviews.length;
+    book.numReviews = book.reviews.length
 
     book.rating =
       book.reviews.reduce((acc, item) => item.rating + acc, 0) /
-      book.reviews.length;
+      book.reviews.length
 
-    await book.save();
+    await book.save()
 
-    res.status(201).json({ message: "Review added" });
+    res.status(201).json({ message: "Review added" })
   } else {
-    res.status(404);
-    throw new Error("Book not found");
+    res.status(404)
+    throw new Error("Book not found")
   }
-});
+})
 
 // @desc    Get top rated books
 // @route   POST /api/books/top
 // @access  Public
 const getTopBooks = asyncHandler(async (req, res) => {
-  const books = await Book.find({}).sort({ rating: -1 }).limit(4);
+  const books = await Book.find({}).sort({ rating: -1 }).limit(4)
 
-  res.json(books);
-});
+  res.json(books)
+})
 
 module.exports = {
   getBooks,
@@ -159,4 +177,4 @@ module.exports = {
   updateBook,
   createBookReview,
   getTopBooks,
-};
+}

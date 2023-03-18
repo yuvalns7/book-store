@@ -9,7 +9,7 @@ import { listBooks } from "../../actions/bookActions"
 import "./HomePage.css"
 
 const HomePage = () => {
-  const { keyword } = useParams()
+  const { keyword, maxPrice, minRating } = useParams()
   const { pageNumber } = useParams() || 1
 
   const dispatch = useDispatch()
@@ -18,7 +18,7 @@ const HomePage = () => {
   const { loading, error, books, page, pages } = bookList
 
   useEffect(() => {
-    dispatch(listBooks(keyword, pageNumber))
+    dispatch(listBooks(keyword, pageNumber, maxPrice, minRating))
   }, [dispatch, keyword, pageNumber])
 
   return (
