@@ -125,7 +125,7 @@ const createBookReview = asyncHandler(async (req, res) => {
   const { rating, comment } = req.body
 
   const book = await Book.findById(req.params.id)
-  req.user = { _id: "6410d6cbcc7e16851e4458e7", name: "dummy2" }
+  // req.user = { _id: "6410d6cbcc7e16851e4458e7", name: "dummy2" }
   if (book) {
     const alreadyReviewed = book.reviews.find(
       (r) => r.user.toString() === req.user._id.toString()
