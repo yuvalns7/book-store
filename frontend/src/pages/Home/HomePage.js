@@ -26,6 +26,7 @@ const HomePage = () => {
       <div className='title'>
         <h2>All Books</h2>
       </div>
+      {books.length === 0 && <Message>No books matched the search</Message>}
       {loading ? (
         <Loader />
       ) : error ? (

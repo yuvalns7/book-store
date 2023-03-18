@@ -165,7 +165,7 @@ const BookDetail = () => {
 
               {book.reviews.length === 0 && <Message>No reviews</Message>}
               {book.reviews.length > 0 && filteredReviews.length === 0 && (
-                <Message>No reviews matches the search</Message>
+                <Message>No reviews matched the search</Message>
               )}
               <div className='list-group'>
                 {filteredReviews.map((review) => (
