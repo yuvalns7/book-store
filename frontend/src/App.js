@@ -18,6 +18,7 @@ import BookList from "./pages/BookList/BookList"
 import BookEdit from "./pages/BookEdit/BookEdit"
 import OrderList from "./pages/OrderList/OrderList"
 import socketIOClient from "socket.io-client"
+import BookOrderChart from "./components/Chart/BookOrderChart"
 const ENDPOINT = "http://127.0.0.1:5000"
 
 const App = () => {
@@ -56,6 +57,7 @@ const App = () => {
             <Route path='/admin/user/:id/edit' element={<UserEdit />} />
             <Route path='/admin/booklist' element={<BookList />} />
             <Route path='/admin/orderlist' element={<OrderList />} />
+            <Route path='/admin/bookOrderChart' element={<BookOrderChart />} />
             <Route
               path='/admin/booklist/:pageNumber'
               element={<BookList />}

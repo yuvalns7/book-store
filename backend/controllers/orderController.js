@@ -1,5 +1,7 @@
 const asyncHandler = require("express-async-handler")
+const { Book } = require("../models/bookModel")
 const { Order } = require("../models/orderModel")
+const { getBookById } = require("./bookController")
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -117,6 +119,33 @@ const getOrders = asyncHandler(async (req, res) => {
   res.json(orders)
 })
 
+const getOrdersByBooks = asyncHandler(async (req, res) => {
+  const aggregatorOpts = [
+    {
+      $unwind: "$orderItems",
+    },
+    {
+      $group: {
+        _id: "$orderItems.book",
+        count: { $sum: 1 },
+      },
+    },
+  ]
+
+  const orders = await Order.aggregate(aggregatorOpts).exec()
+  const bookOrders = []
+
+  for await (let order of orders) {
+    const book = await Book.findById(order._id)
+    bookOrders.push({
+      name: book?.name,
+      pv: order.count,
+    })
+  }
+
+  res.json(bookOrders)
+})
+
 module.exports = {
   addOrderItems,
   getOrderById,
@@ -124,4 +153,5 @@ module.exports = {
   updateOrderToDelivered,
   getMyOrder,
   getOrders,
+  getOrdersByBooks,
 }
