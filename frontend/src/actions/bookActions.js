@@ -24,14 +24,15 @@ import {
 } from "../constants/bookConstants"
 
 export const listBooks =
-  (keyword = "", pageNumber = "", maxPrice = 10000000, minRating = 0) =>
+  (keyword = "", pageNumber = "", maxPrice = 10000000, rating = "") =>
   async (dispatch) => {
     try {
       dispatch({ type: BOOK_LIST_REQUEST })
       keyword = keyword === "all" ? "" : keyword
+      rating = rating === "all" ? "" : rating
 
       const { data } = await axios.get(
-        `/api/books?keyword=${keyword}&pageNumber=${pageNumber}&maxPrice=${maxPrice}&minRating=${minRating}`
+        `/api/books?keyword=${keyword}&pageNumber=${pageNumber}&maxPrice=${maxPrice}&rating=${rating}`
       )
 
       dispatch({ type: BOOK_LIST_SUCCESS, payload: data })

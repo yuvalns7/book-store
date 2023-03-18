@@ -23,10 +23,10 @@ const getBooks = asyncHandler(async (req, res) => {
         },
       }
     : {}
-  const minRating = req.query.minRating
+  const rating = req.query.rating
     ? {
         rating: {
-          $gte: Number(req.query.minRating),
+          $eq: Number(req.query.rating),
         },
       }
     : {}
@@ -34,9 +34,9 @@ const getBooks = asyncHandler(async (req, res) => {
   const count = await Book.countDocuments({
     ...keyword,
     ...maxPrice,
-    ...minRating,
+    ...rating,
   })
-  const books = await Book.find({ ...keyword, ...maxPrice, ...minRating })
+  const books = await Book.find({ ...keyword, ...maxPrice, ...rating })
     .limit(pageSize)
     .skip(pageSize * (page - 1))
 
@@ -125,7 +125,7 @@ const createBookReview = asyncHandler(async (req, res) => {
   const { rating, comment } = req.body
 
   const book = await Book.findById(req.params.id)
-
+  req.user = { _id: "6410d6cbcc7e16851e4458e7", name: "dummy2" }
   if (book) {
     const alreadyReviewed = book.reviews.find(
       (r) => r.user.toString() === req.user._id.toString()

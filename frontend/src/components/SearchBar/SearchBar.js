@@ -5,14 +5,14 @@ import "./SearchBar.css"
 const SearchBar = () => {
   const [keyword, setKeyword] = useState("all")
   const [maxPrice, setMaxPrice] = useState(10000000)
-  const [minRating, setMinRating] = useState(0)
+  const [rating, setrating] = useState("all")
   const navigate = useNavigate()
 
   const submitHandler = (e) => {
     e.preventDefault()
 
-    if (keyword !== "all" || maxPrice < 10000000 || minRating != 0) {
-      navigate(`/search/${keyword}/${maxPrice}/${minRating}`)
+    if (keyword !== "all" || maxPrice < 10000000 || rating) {
+      navigate(`/search/${keyword}/${maxPrice}/${rating}`)
     } else {
       navigate("/")
     }
@@ -33,14 +33,20 @@ const SearchBar = () => {
         onChange={(e) => setMaxPrice(e.target.value)}
         placeholder='Search Book By Max Price...'
       />
-      <input
-        type='number'
-        className='form-control me-4'
-        onChange={(e) => setMinRating(e.target.value)}
-        min='1'
-        max='5'
-        placeholder='Search Book By Min Rating...'
-      />
+
+      <select
+        id='rating'
+        className='form-select form-control'
+        value={rating}
+        placeholder='Search Book By Rating...'
+        onChange={(e) => setrating(e.target.value)}>
+        <option value='all'>show all</option>
+        <option value='1'>1 - Poor</option>
+        <option value='2'>2 - Fair</option>
+        <option value='3'>3 - Good</option>
+        <option value='4'>4 - Very Good</option>
+        <option value='5'>5 - Excellent</option>
+      </select>
       <button type='submit' className='btn search-btn'>
         Search
       </button>

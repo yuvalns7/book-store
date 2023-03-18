@@ -46,7 +46,7 @@ const App = () => {
             />
             <Route path='/admin/book/:id/edit' element={<BookEdit />} />
             <Route
-              path='/search/:keyword/:maxPrice/:minRating'
+              path='/search/:keyword/:maxPrice/:rating'
               element={<Home />}
               exact
             />
